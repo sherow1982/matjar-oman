@@ -31,7 +31,7 @@
         <div id="product-grid" class="product-grid"></div>
     </main>
     <script>
-        const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json?raw=1';
+        const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
         const phoneNumber = '+201110760081'; // قم بتغيير هذا الرقم
 
         function openWhatsApp(productName, price) {
@@ -41,7 +41,12 @@
 
         document.addEventListener('DOMContentLoaded', () => {
           fetch(productsUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(products => {
               const productGrid = document.getElementById('product-grid');
               products.forEach(product => {
@@ -55,15 +60,14 @@
                   <div class="buttons-container">
                     <button class="btn whatsapp-btn" onclick="openWhatsApp('${product.العنوان}', '${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']}')">واتساب</button>
                     <a href="${detailPageUrl}" class="btn details-btn" target="_blank">تفاصيل المنتج</a>
-                    <a href="${product.الرابط}" target="_blank" class="btn buy-now-btn">اشتريه الآن</a>
                   </div>
                 `;
                 productGrid.appendChild(card);
               });
             })
-            .catch(e => {
-              document.getElementById('product-grid').innerHTML = '<p>حدث خطأ في تحميل المنتجات.</p>';
-              console.error(e);
+            .catch(error => {
+              document.getElementById('product-grid').innerHTML = '<p>حدث خطأ في تحميل المنتجات. يرجى التأكد من أن رابط ملف JSON صحيح ومتاح.</p>';
+              console.error('Error fetching products:', error);
             });
         });
     </script>
