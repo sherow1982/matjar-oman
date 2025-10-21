@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>مدونة متجر عمان | دليلك لشراء أفضل المنتجات</title>
     <meta name="description" content="مقالات ومراجعات مفصلة لأحدث المنتجات في سلطنة عمان.">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
     <style>
-        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background: #f8f8f8; }
-        .container { width: 90%; max-width: 900px; margin: 0 auto; padding: 20px; }
-        header, footer { text-align: center; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        header nav a, footer nav a { margin: 0 15px; color: #007bff; font-weight: bold; text-decoration: none; }
-        .brand { font-size: 1.8rem; font-weight: bold; color: #333; text-decoration: none; display: block; margin-bottom: 10px; }
-        footer { margin-top: 40px; padding-bottom: 20px; }
-        article { background: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .btn-container { margin-top: 20px; text-align: center; }
-        .whatsapp-btn, .buy-now-btn { border-radius: 30px; padding: 12px 25px; margin: 5px; font-weight: bold; text-decoration: none; }
-        .whatsapp-btn { background-color: #25D366; color: white; }
-        .buy-now-btn { background-color: #007bff; color: white; }
+     body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background: #f8f8f8; color: #333; }
+     .container { width: 90%; max-width: 900px; margin: auto; padding: 20px; }
+     header, footer { text-align: center; background: #fff; padding: 1rem 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+     header nav a, footer nav a { margin: 0 15px; color: #007bff; font-weight: bold; text-decoration: none; }
+     .brand { font-size: 1.8rem; font-weight: bold; color: #333; text-decoration: none; display: block; margin-bottom: 10px; }
+     footer { margin-top: 40px; padding-bottom: 20px; }
+     article { background: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+     .btn-container { margin-top: 20px; text-align: center; }
+     .whatsapp-btn, .buy-now-btn { border-radius: 30px; padding: 12px 25px; margin: 5px; font-weight: bold; text-decoration: none; display: inline-block; color: white; border: none; }
+     .whatsapp-btn { background-color: #25D366; }
+     .buy-now-btn { background-color: #007bff; }
+     h2 { margin-top: 0; }
+     p { line-height: 1.8; }
     </style>
 </head>
 <body>
@@ -32,7 +34,7 @@
     </header>
     <main class="container">
         <h1 style="text-align:center;">مدونة منتجات متجر عمان</h1>
-        <div id="blog-posts"></div>
+        <div id="blog-posts">جارٍ تحميل المقالات...</div>
     </main>
     <footer>
         <nav>
@@ -47,7 +49,19 @@
         const phoneNumber = '+201110760081';
 
         function generateSeoArticle(product) {
-            // ... (كود توليد المقالات يبقى كما هو)
+          const title = product.العنوان;
+          const keywords = `${title}, شراء ${title}, أفضل ${title} في عمان, تسوق ${title} أونلاين, سعر ${title} في عمان`;
+          return `
+            <article>
+                <h2>دليلك الشامل لشراء ${title} في سلطنة عمان</h2>
+                <p>في سوق اليوم المزدحم بالخيارات، يبرز <strong>${title}</strong> كأحد المنتجات التي تجمع بين الجودة الفائقة والسعر التنافسي، مما يجعله الخيار الأول للكثيرين في سلطنة عمان. سواء كنت تبحث عن حل عملي لاحتياجاتك اليومية أو ترغب في الحصول على أحدث التقنيات، فإن هذا المنتج يقدم لك قيمة حقيقية.</p>
+                <p>أصبح <strong>تسوق ${title} أونلاين</strong> الآن أسهل من أي وقت مضى عبر متجرنا. نحن نوفر لك تجربة شراء سلسة وآمنة، مع ضمان الحصول على أفضل <strong>سعر لـ ${title} في عمان</strong>. الكلمات المفتاحية مثل <i>${keywords}</i> تلعب دورًا حيويًا في مساعدتك على إيجاد هذا المنتج الاستثنائي بسهولة.</p>
+                <div class="btn-container">
+                    <button class="whatsapp-btn" onclick="window.open('https://wa.me/${phoneNumber}?text=أهلاً، أرغب في الاستفسار عن منتج: ${title}', '_blank')">تواصل واتساب</button>
+                    <a href="${product.الرابط}" class="buy-now-btn" target="_blank">اشتريه الآن من المتجر الأصلي</a>
+                </div>
+            </article>
+          `;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -59,6 +73,9 @@
                     products.forEach(product => {
                         blogPostsContainer.innerHTML += generateSeoArticle(product);
                     });
+                })
+                .catch(() => {
+                    blogPostsContainer.innerHTML = '<p>حدث خطأ في تحميل المقالات.</p>';
                 });
         });
     </script>
