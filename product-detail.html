@@ -28,7 +28,7 @@
         <a href="index.html" style="display:block; text-align:center; margin-top:20px; color:#007bff; font-weight:bold; text-decoration:none;">العودة للمنتجات</a>
     </div>
     <script>
-        const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json?raw=1';
+        const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
         const MALE_NAMES = ["سعود", "خالد", "علي", "ناصر", "فهد", "طارق", "سالم", "هشام"];
         const FEMALE_NAMES = ["سارة", "نور", "هدى", "ميساء", "ريم", "جود", "ليان", "دانية"];
         const REVIEW_TEXTS = [
@@ -39,49 +39,35 @@
             "لا تترددوا، منتج بطل ويستاهل التجربة. ما ندمت إني خذيته."
         ];
 
-        function parseQuery(string) {
-            const obj = {};
-            const pairs = string.substring(1).split("&");
-            for(let i = 0; i < pairs.length; i++) {
-                const pair = pairs[i].split("=");
-                obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-            }
-            return obj;
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const productName = params.get('name');
 
-        function generateRandomReviews() {
-            let reviewsHtml = '';
-            let usedNames = new Set();
-            let usedTexts = new Set();
-            function getName() {
-                while(true) {
-                    const gender = Math.random() < 0.5 ? 'male' : 'female';
-                    const names = gender === 'male' ? MALE_NAMES : FEMALE_NAMES;
-                    const name = names[Math.floor(Math.random() * names.length)];
-                    if(!usedNames.has(name)) {
-                        usedNames.add(name);
-                        return name;
+            if (!productName) {
+                document.getElementById('product-detail').innerHTML = '<p>لم يتم تحديد المنتج.</p>';
+                return;
+            }
+
+            fetch(productsUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                }
-            }
-            function getText() {
-                while(true) {
-                    const text = REVIEW_TEXTS[Math.floor(Math.random() * REVIEW_TEXTS.length)];
-                    if(!usedTexts.has(text)) {
-                        usedTexts.add(text);
-                        return text;
+                    return response.json();
+                })
+                .then(products => {
+                    const product = products.find(p => p.العنوان === productName);
+                    if (product) {
+                        displayProductDetails(product);
+                    } else {
+                        document.getElementById('product-detail').innerHTML = '<p>المنتج غير موجود.</p>';
                     }
-                }
-            }
-            for(let i = 0; i < 3; i++) {
-                const rating = Math.floor(Math.random() * 2) + 4;
-                const stars = '&#9733;'.repeat(rating) + '&#9734;'.repeat(5-rating);
-                const name = getName();
-                const text = getText();
-                reviewsHtml += `<div class="review-item"><div class="review-stars">${stars}</div><div class="review-author">${name}</div><div class="review-text">${text}</div></div>`;
-            }
-            return reviewsHtml;
-        }
+                })
+                .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    document.getElementById('product-detail').innerHTML = '<p>حدث خطأ في تحميل بيانات المنتج.</p>';
+                });
+        });
 
         function displayProductDetails(product) {
             const detailContainer = document.getElementById('product-detail');
@@ -98,30 +84,31 @@
             `;
         }
 
-        function fetchAndDisplayProduct() {
-            const params = parseQuery(window.location.search);
-            const productName = params['name'];
-            if(!productName) {
-                document.getElementById('product-detail').innerHTML = '<p>لم يتم تحديد المنتج.</p>';
-                return;
-            }
-            fetch(productsUrl)
-                .then(res => res.json())
-                .then(products => {
-                    const product = products.find(p => p.العنوان === productName);
-                    if(product) {
-                        displayProductDetails(product);
-                    } else {
-                        document.getElementById('product-detail').innerHTML = '<p>المنتج غير موجود.</p>';
-                    }
-                })
-                .catch(err => {
-                    document.getElementById('product-detail').innerHTML = '<p>حدث خطأ في تحميل بيانات المنتج.</p>';
-                    console.error(err);
-                });
-        }
+        function generateRandomReviews() {
+            let reviewsHtml = '';
+            const names = [...MALE_NAMES, ...FEMALE_NAMES];
+            const usedNames = new Set();
+            const usedTexts = new Set();
 
-        document.addEventListener('DOMContentLoaded', fetchAndDisplayProduct);
+            for (let i = 0; i < 3; i++) { // Generate 3 unique reviews
+                let name, text;
+                do { name = names[Math.floor(Math.random() * names.length)]; } while (usedNames.has(name));
+                do { text = REVIEW_TEXTS[Math.floor(Math.random() * REVIEW_TEXTS.length)]; } while (usedTexts.has(text));
+                
+                usedNames.add(name);
+                usedTexts.add(text);
+                
+                const rating = Math.floor(Math.random() * 2) + 4; // 4 or 5 stars
+                reviewsHtml += `
+                    <div class="review-item">
+                        <div class="review-stars">${'&#9733;'.repeat(rating)}${'&#9734;'.repeat(5 - rating)}</div>
+                        <p><strong>${name}</strong></p>
+                        <p>${text}</p>
+                    </div>
+                `;
+            }
+            return reviewsHtml;
+        }
     </script>
 </body>
 </html>
