@@ -77,3 +77,4 @@ jobs:
           git diff --staged --quiet || git commit -m "Automated: Update Google Merchant feed"
           git push
 
+
