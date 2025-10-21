@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 3 * * *' # يعمل كل يوم الساعة 3 صباحاً
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:
@@ -26,61 +26,12 @@ jobs:
       - name: Generate Google Feed file
         run: |
           npm install node-fetch@2
-          # استخدام await لضمان اكتمال العملية
-          await node -e "
-            async function generateFeed() {
-              const fetch = require('node-fetch');
-              const fs = require('fs').promises;
-              const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
-              
-              try {
-                const response = await fetch(productsUrl);
-                const products = await response.json();
-                let xmlItems = '';
+          node generate-feed.js
 
-                products.forEach(product => {
-                  const productId = String(product.id || product.العنوان).replace(/&/g, '&amp;');
-                  const productLink = \`https://sherow1982.github.io/matjar-oman/product-detail.html?name=\${encodeURIComponent(product.العنوان)}\`;
-                  const price = \`\${String(product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']).replace(/[^0-9.]/g, '')} OMR\`;
-
-                  xmlItems += \`
-      <item>
-        <g:id>\${productId}</g:id>
-        <title><![CDATA[\${product.العنوان}]]></title>
-        <description><![CDATA[\${product.الوصف}]]></description>
-        <link>\${productLink}</link>
-        <g:image_link>\${product['رابط الصورة']}</g:image_link>
-        <g:availability>in_stock</g:availability>
-        <g:price>\${price}</g:price>
-        <g:brand><![CDATA[متجر عمان]]></g:brand>
-        <g:condition>new</g:condition>
-      </item>\`;
-                });
-
-                const fullFeed = \`<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>
-<rss xmlns:g=\\\"http://base.google.com/ns/1.0\\\" version=\\\"2.0\\\">
-<channel>
-  <title>متجر عمان</title>
-  <link>https://sherow1982.github.io/matjar-oman/</link>
-  <description>قائمة منتجات متجر عمان</description>\${xmlItems}
-</channel>
-</rss>\`;
-                await fs.writeFile('google-feed.xml', fullFeed);
-                console.log('Google Merchant feed generated successfully.');
-              } catch (error) {
-                console.error('Failed to generate feed:', error);
-                process.exit(1);
-              }
-            }
-            generateFeed();
-          "
       - name: Commit and Push
         uses: EndBug/add-and-commit@v9
         with:
-          # اسم ورسالة الـ commit
           author_name: github-actions[bot]
           author_email: 41898282+github-actions[bot]@users.noreply.github.com
           message: 'Automated: Update Google Merchant feed'
-          
-          # الملف الذي سيتم إضافته وحفظه
           add: 'google-feed.xml'
