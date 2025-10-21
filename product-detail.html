@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- سيتم تحديث العنوان والوصف عبر JavaScript -->
     <title>تفاصيل المنتج - متجر عمان</title>
-    <meta name="description" content="اكتشف تفاصيل المنتج ومواصفاته الكاملة. أفضل الأسعار في سلطنة عمان مع تقييمات حقيقية من المشترين.">
+    <meta name="description" content="صفحة تفاصيل المنتج في متجر عمان. شراء منتجات عالية الجودة بأسعار تنافسية من سلطنة عمان مع تقييمات حقيقية.">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
         body { font-family: "Cairo", sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; color: #333; }
@@ -47,17 +46,26 @@
             }
 
             fetch(productsUrl)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(products => {
                     const product = products.find(p => p.العنوان === productName);
                     if (product) {
-                        // --- تحديثات SEO ---
                         document.title = `${product.العنوان} | أفضل سعر في عمان`;
                         document.querySelector('meta[name="description"]').setAttribute("content", `اشترِ ${product.العنوان} بأفضل سعر في سلطنة عمان. ${product.الوصف.substring(0, 120)}...`);
-                        
                         addJsonLdSchema(product);
                         displayProductDetails(product);
+                    } else {
+                        document.getElementById('product-detail').innerHTML = '<p>المنتج غير موجود.</p>';
                     }
+                })
+                .catch(error => {
+                    document.getElementById('product-detail').innerHTML = '<p>حدث خطأ في تحميل بيانات المنتج.</p>';
+                    console.error(error);
                 });
         });
 
@@ -68,14 +76,14 @@
                 "name": product.العنوان,
                 "image": product['رابط الصورة'],
                 "description": product.الوصف,
-                "brand": { "@type": "Brand", "name": "متجر عمان" },
+                "brand": {"@type": "Brand", "name": "متجر عمان"},
                 "offers": {
                     "@type": "Offer",
                     "url": product.الرابط,
                     "priceCurrency": "OMR",
                     "price": product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ'].replace(' OMR', ''),
                     "availability": "https://schema.org/InStock",
-                    "seller": { "@type": "Organization", "name": "متجر عمان" }
+                    "seller": {"@type": "Organization", "name": "متجر عمان"}
                 },
                 "aggregateRating": {
                     "@type": "AggregateRating",
@@ -93,7 +101,7 @@
             const detailContainer = document.getElementById('product-detail');
             detailContainer.innerHTML = `
                 <h1>${product.العنوان}</h1>
-                <img src="${product['رابط الصورة']}" alt="شراء ${product.العنوان} في عمان">
+                <img loading="lazy" src="${product['رابط الصورة']}" alt="شراء ${product.العنوان} في عمان">
                 <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
                 <a href="${product.الرابط}" target="_blank" class="btn">اشتريه الآن من المتجر الأصلي</a>
                 <div class="description"><h2>وصف المنتج</h2><p>${product.الوصف.replace(/\\n/g, '<br>')}</p></div>
@@ -109,14 +117,14 @@
             const names = [...MALE_NAMES, ...FEMALE_NAMES];
             const usedNames = new Set();
             const usedTexts = new Set();
-            for (let i = 0; i < 3; i++) {
+            for(let i=0; i<3; i++) {
                 let name, text;
-                do { name = names[Math.floor(Math.random() * names.length)]; } while (usedNames.has(name));
-                do { text = REVIEW_TEXTS[Math.floor(Math.random() * REVIEW_TEXTS.length)]; } while (usedTexts.has(text));
+                do { name = names[Math.floor(Math.random()*names.length)]; } while (usedNames.has(name));
+                do { text = REVIEW_TEXTS[Math.floor(Math.random()*REVIEW_TEXTS.length)]; } while (usedTexts.has(text));
                 usedNames.add(name);
                 usedTexts.add(text);
-                const rating = Math.floor(Math.random() * 2) + 4;
-                reviewsHtml += `<div class="review-item"><div class="review-stars">${'&#9733;'.repeat(rating)}${'&#9734;'.repeat(5 - rating)}</div><p><strong>${name}</strong></p><p>${text}</p></div>`;
+                const rating = Math.floor(Math.random()*2) + 4;
+                reviewsHtml += `<div class="review-item"><div class="review-stars">${'&#9733;'.repeat(rating)}${'&#9734;'.repeat(5-rating)}</div><p><strong>${name}</strong></p><p>${text}</p></div>`;
             }
             return reviewsHtml;
         }
