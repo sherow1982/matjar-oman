@@ -5,37 +5,292 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر عمان</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- General Body Styles --- */
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            direction: rtl;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background-color: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* --- Product Grid --- */
+        .product-section {
+            padding: 40px 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .product-card img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .product-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        /* --- Product Detail View --- */
+        .product-detail-view {
+            padding: 40px 0;
+        }
+        
+        .product-detail-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        
+        .product-detail-image img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        .product-detail-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .price-detail {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .description h2 {
+            font-size: 1.5rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .description p {
+            line-height: 1.8;
+            color: #555;
+            white-space: pre-wrap; /* للحفاظ على فواصل الأسطر من الوصف */
+        }
+        
+        .whatsapp-btn-large {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .whatsapp-btn-large:hover {
+            transform: scale(1.05);
+        }
+        
+        .back-btn {
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --- Helper Class --- */
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="container">
-                <a href="#" class="brand">متجر عمان</a>
-                <ul class="nav-links">
-                    <li><a href="#">الرئيسية</a></li>
-                    <li><a href="#">الأقسام</a></li>
-                    <li><a href="#">تواصل معنا</a></li>
-                </ul>
+                <a href="index.html" class="brand">متجر عمان</a>
             </div>
         </nav>
     </header>
 
     <main class="container">
-        <section class="product-section">
+        <!-- قسم عرض جميع المنتجات (يظهر افتراضيًا) -->
+        <section id="product-list-section" class="product-section">
             <h2>جميع المنتجات</h2>
-            <div class="product-grid">
-                <!-- سيتم عرض المنتجات هنا تلقائياً -->
+            <div id="product-grid" class="product-grid">
+                <!-- سيتم ملء المنتجات هنا بواسطة JavaScript -->
             </div>
+        </section>
+
+        <!-- قسم عرض تفاصيل المنتج (مخفي افتراضيًا) -->
+        <section id="product-detail-section" class="product-detail-view hidden">
+            <!-- سيتم ملء تفاصيل المنتج هنا بواسطة JavaScript -->
         </section>
     </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 متجر عمان. جميع الحقوق محفوظة.</p>
-        </div>
-    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const productListSection = document.getElementById('product-list-section');
+            const productDetailSection = document.getElementById('product-detail-section');
+            const productGrid = document.getElementById('product-grid');
+            const phoneNumber = '+201110760081'; // <-- ضع رقمك هنا
 
-    <script src="script.js"></script>
+            let productsData = [];
+
+            // تحميل المنتجات من ملف JSON
+            fetch('products.json')
+                .then(response => response.json())
+                .then(data => {
+                    productsData = data;
+                    renderProductGrid();
+                })
+                .catch(error => {
+                    console.error('خطأ في تحميل المنتجات:', error);
+                    productGrid.innerHTML = '<p>عفواً، لم نتمكن من تحميل المنتجات.</p>';
+                });
+
+            // دالة لعرض جميع المنتجات
+            function renderProductGrid() {
+                productGrid.innerHTML = '';
+                productsData.forEach((product, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.dataset.index = index; // استخدام الفهرس لتحديد المنتج
+
+                    const title = product['العنوان'] || 'منتج';
+                    const image = product['رابط الصورة'] || 'https://via.placeholder.com/300';
+                    const discountedPrice = product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ'];
+                    const originalPrice = product['ﺎﻠﺴﻋﺭ'];
+
+                    card.innerHTML = `
+                        <img src="${image}" alt="${title}">
+                        <h3>${title}</h3>
+                        <p class="price">${discountedPrice} <span class="old-price">${originalPrice || ''}</span></p>
+                    `;
+                    
+                    card.addEventListener('click', () => showProductDetail(index));
+                    productGrid.appendChild(card);
+                });
+            }
+
+            // دالة لعرض تفاصيل منتج معين
+            function showProductDetail(index) {
+                const product = productsData[index];
+                if (!product) return;
+                
+                const title = product['العنوان'] || 'منتج';
+                const image_url = product['رابط الصورة'] || 'https://via.placeholder.com/500';
+                const description = product['الوصف'] || 'لا يوجد وصف.';
+                const discounted_price = product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ'];
+                const original_price = product['ﺎﻠﺴﻋﺭ'];
+
+                const whatsappMessage = encodeURIComponent(`أهلاً، أرغب في طلب المنتج التالي:\n\n*المنتج:* ${title}\n*السعر:* ${discounted_price}`);
+                const whatsappLink = `https://wa.me/${phoneNumber}?text=${whatsappMessage}`;
+
+                productDetailSection.innerHTML = `
+                    <div class="product-detail-content">
+                        <div class="product-detail-image">
+                            <img src="${image_url}" alt="${title}">
+                        </div>
+                        <div class="product-detail-info">
+                            <h1>${title}</h1>
+                            <p class="price-detail">${discounted_price} <span class="old-price">${original_price || ''}</span></p>
+                            <div class="description">
+                                <h2>وصف المنتج</h2>
+                                <p>${description}</p>
+                            </div>
+                            <a href="${whatsappLink}" class="whatsapp-btn-large" target="_blank">اطلب الآن عبر واتساب</a>
+                            <a class="back-btn">العودة إلى جميع المنتجات</a>
+                        </div>
+                    </div>
+                `;
+
+                // إضافة وظيفة لزر العودة
+                productDetailSection.querySelector('.back-btn').addEventListener('click', showProductList);
+
+                // تبديل العرض
+                productListSection.classList.add('hidden');
+                productDetailSection.classList.remove('hidden');
+                window.scrollTo(0, 0); // الانتقال لأعلى الصفحة
+            }
+
+            // دالة للعودة إلى قائمة المنتجات
+            function showProductList() {
+                productDetailSection.classList.add('hidden');
+                productListSection.classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
