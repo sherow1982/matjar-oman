@@ -26,7 +26,7 @@ jobs:
       - name: Generate Google Feed file
         run: |
           npm install node-fetch@2
-          # انتظر حتى يكتمل إنشاء الملف قبل المتابعة
+          # استخدام await لضمان اكتمال العملية
           await node -e "
             async function generateFeed() {
               const fetch = require('node-fetch');
