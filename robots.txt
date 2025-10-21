@@ -1,0 +1,24 @@
+# Allow all crawlers
+User-agent: *
+
+# Allow main pages
+Allow: /
+Allow: /index.html
+Allow: /blog.html
+Allow: /product-detail.html
+
+# Disallow unnecessary pages for SEO
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /account/
+Disallow: /login/
+Disallow: /register/
+
+# Disallow URL parameters that create duplicate content
+Disallow: /*?ref=
+Disallow: /*?sort=
+Disallow: /*?filter=
+Disallow: /*?page=
+
+# Sitemap location
+Sitemap: https://sherow1982.github.io/matjar-oman/sitemap.xml
