@@ -1,43 +1,43 @@
-name: Generate Google Merchant Feed
+name: Generate and Deploy Google Feed
 
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: '0 2 * * *' # يعمل تلقائياً كل يوم الساعة 2 صباحاً
+    - cron: '0 3 * * *' # يعمل كل يوم الساعة 3 صباحاً
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # منح الإذن للكتابة على المستودع
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }} # استخدام التوكن للسماح بالدفع للفرع
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Generate Google Feed
-        id: generate_feed
+      - name: Generate Google Feed file
         run: |
           npm install node-fetch@2
-          node -e "
-            const fetch = require('node-fetch');
-            const fs = require('fs');
-            const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
-            let xmlItems = '';
-            
-            fetch(productsUrl)
-              .then(res => res.json())
-              .then(products => {
+          # انتظر حتى يكتمل إنشاء الملف قبل المتابعة
+          await node -e "
+            async function generateFeed() {
+              const fetch = require('node-fetch');
+              const fs = require('fs').promises;
+              const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
+              
+              try {
+                const response = await fetch(productsUrl);
+                const products = await response.json();
+                let xmlItems = '';
+
                 products.forEach(product => {
                   const productId = String(product.id || product.العنوان).replace(/&/g, '&amp;');
                   const productLink = \`https://sherow1982.github.io/matjar-oman/product-detail.html?name=\${encodeURIComponent(product.العنوان)}\`;
@@ -65,16 +65,22 @@ jobs:
   <description>قائمة منتجات متجر عمان</description>\${xmlItems}
 </channel>
 </rss>\`;
-                fs.writeFileSync('google-feed.xml', fullFeed);
-              });
+                await fs.writeFile('google-feed.xml', fullFeed);
+                console.log('Google Merchant feed generated successfully.');
+              } catch (error) {
+                console.error('Failed to generate feed:', error);
+                process.exit(1);
+              }
+            }
+            generateFeed();
           "
-      - name: Commit and Push if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add google-feed.xml
-          # التحقق إذا كان هناك تغييرات قبل الدفع
-          git diff --staged --quiet || git commit -m "Automated: Update Google Merchant feed"
-          git push
-
-
+      - name: Commit and Push
+        uses: EndBug/add-and-commit@v9
+        with:
+          # اسم ورسالة الـ commit
+          author_name: github-actions[bot]
+          author_email: 41898282+github-actions[bot]@users.noreply.github.com
+          message: 'Automated: Update Google Merchant feed'
+          
+          # الملف الذي سيتم إضافته وحفظه
+          add: 'google-feed.xml'
