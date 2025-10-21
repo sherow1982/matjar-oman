@@ -52,3 +52,4 @@ document.addEventListener('DOMContentLoaded', function() {
             productGrid.innerHTML = '<p>عفواً، لم نتمكن من تحميل المنتجات.</p>';
         });
 });
+
