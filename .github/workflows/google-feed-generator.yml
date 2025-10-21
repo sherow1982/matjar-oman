@@ -5,21 +5,20 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 2 * * *' # يعمل تلقائياً كل يوم الساعة 2 صباحاً
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     permissions:
-      contents: write
-      pages: write
-      id-token: write
+      contents: write # منح الإذن للكتابة على المستودع
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # استخدام التوكن للسماح بالدفع للفرع
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,31 +30,34 @@ jobs:
         run: |
           npm install node-fetch@2
           node -e "
-          const fetch = require('node-fetch');
-          const fs = require('fs');
-          const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
-          let xmlItems = '';
-          fetch(productsUrl)
-            .then(res => res.json())
-            .then(products => {
-              products.forEach(product => {
-                const productId = String(product.id || product.العنوان).replace(/&/g, '&amp;');
-                const productLink = \`https://sherow1982.github.io/matjar-oman/product-detail.html?name=\${encodeURIComponent(product.العنوان)}\`;
-                const price = \`\${String(product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']).replace(/[^0-9.]/g, '')} OMR\`;
-                xmlItems += \`
-    <item>
-      <g:id>\${productId}</g:id>
-      <title><![CDATA[\${product.العنوان}]]></title>
-      <description><![CDATA[\${product.الوصف}]]></description>
-      <link>\${productLink}</link>
-      <g:image_link>\${product['رابط الصورة']}</g:image_link>
-      <g:availability>in_stock</g:availability>
-      <g:price>\${price}</g:price>
-      <g:brand><![CDATA[متجر عمان]]></g:brand>
-      <g:condition>new</g:condition>
-    </item>\`;
-              });
-              const fullFeed = \`<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>
+            const fetch = require('node-fetch');
+            const fs = require('fs');
+            const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
+            let xmlItems = '';
+            
+            fetch(productsUrl)
+              .then(res => res.json())
+              .then(products => {
+                products.forEach(product => {
+                  const productId = String(product.id || product.العنوان).replace(/&/g, '&amp;');
+                  const productLink = \`https://sherow1982.github.io/matjar-oman/product-detail.html?name=\${encodeURIComponent(product.العنوان)}\`;
+                  const price = \`\${String(product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']).replace(/[^0-9.]/g, '')} OMR\`;
+
+                  xmlItems += \`
+      <item>
+        <g:id>\${productId}</g:id>
+        <title><![CDATA[\${product.العنوان}]]></title>
+        <description><![CDATA[\${product.الوصف}]]></description>
+        <link>\${productLink}</link>
+        <g:image_link>\${product['رابط الصورة']}</g:image_link>
+        <g:availability>in_stock</g:availability>
+        <g:price>\${price}</g:price>
+        <g:brand><![CDATA[متجر عمان]]></g:brand>
+        <g:condition>new</g:condition>
+      </item>\`;
+                });
+
+                const fullFeed = \`<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>
 <rss xmlns:g=\\\"http://base.google.com/ns/1.0\\\" version=\\\"2.0\\\">
 <channel>
   <title>متجر عمان</title>
@@ -63,17 +65,15 @@ jobs:
   <description>قائمة منتجات متجر عمان</description>\${xmlItems}
 </channel>
 </rss>\`;
-              fs.writeFileSync('google-feed.xml', fullFeed);
-            });
+                fs.writeFileSync('google-feed.xml', fullFeed);
+              });
           "
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-          
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Commit and Push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add google-feed.xml
+          # التحقق إذا كان هناك تغييرات قبل الدفع
+          git diff --staged --quiet || git commit -m "Automated: Update Google Merchant feed"
+          git push
+
