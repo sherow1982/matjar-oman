@@ -3,23 +3,12 @@ import os
 import urllib.parse
 
 # --- الإعدادات ---
-JSON_FILE = 'products.json' 
-OUTPUT_DIR = 'products'     
+JSON_FILE = 'products.json'
+OUTPUT_DIR = 'products'
+PHONE_NUMBER = '+201110760081' # !!! قم بتغيير هذا الرقم
 
-# --- قالب صفحة المنتج (مع المسارات المصححة) ---
-def get_product_html_template(product, phone_number):
-    title = product.get('العنوان', 'اسم المنتج غير متوفر')
-    image_url = product.get('رابط الصورة', 'https://via.placeholder.com/500')
-    description = product.get('الوصف', 'لا يوجد وصف لهذا المنتج.').replace('\n', '<br>')
-    discounted_price = product.get('ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ', '')
-    original_price = product.get('ﺎﻠﺴﻋﺭ', '')
-    
-    # رسالة الواتساب
-    whatsapp_message = urllib.parse.quote(f"أهلاً، أرغب في طلب المنتج التالي:\n\n*المنتج:* {title}\n*السعر:* {discounted_price}")
-    whatsapp_link = f"https://wa.me/{phone_number}?text={whatsapp_message}"
-
-    # لاحظ التغيير هنا: ../style.css و ../index.html
-    return f"""
+# --- قالب صفحة المنتج ---
+PRODUCT_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -27,71 +16,77 @@ def get_product_html_template(product, phone_number):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <style>
+        body {{ font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; color: #333; }}
+        .container {{ max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
+        img {{ max-width: 100%; border-radius: 8px; margin-bottom: 20px; }}
+        h1 {{ text-align: center; }}
+        .price {{ text-align: center; font-size: 2rem; font-weight: bold; color: #28a745; }}
+        .old-price {{ color: #999; text-decoration: line-through; font-size: 1.2rem; }}
+        .description {{ line-height: 1.8; white-space: pre-wrap; margin: 20px 0; text-align: right; }}
+        .buttons-container {{ text-align: center; margin-top: 20px; }}
+        .btn {{ cursor: pointer; border-radius: 50px; border: none; padding: 12px 25px; font-size: 1rem; font-weight: bold; margin: 5px; text-decoration: none; display: inline-block; }}
+        .whatsapp-btn {{ background-color: #25D366; color: white; }}
+        .details-btn, .buy-now-btn {{ background-color: #007bff; color: white; }}
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="container">
-                <a href="../index.html" class="brand">متجر عمان</a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container">
-        <section class="product-detail">
-            <div class="product-image">
-                <img src="{image_url}" alt="{title}">
-            </div>
-            <div class="product-info">
-                <h1>{title}</h1>
-                <p class="price-detail">{discounted_price} <span class="old-price">{original_price}</span></p>
-                <div class="description">
-                    <h2>وصف المنتج</h2>
-                    <p>{description}</p>
-                </div>
-                <a href="{whatsapp_link}" class="whatsapp-btn-large" target="_blank">اطلب الآن عبر واتساب</a>
-                <a href="../index.html" class="back-btn">العودة إلى جميع المنتجات</a>
-            </div>
-        </section>
-    </main>
+    <div class="container">
+        <h1>{title}</h1>
+        <img src="{image}" alt="{title}">
+        <p class="price">{new_price} <span class="old-price">{old_price}</span></p>
+        <div class="buttons-container">
+            <a href="{whatsapp_link}" class="btn whatsapp-btn" target="_blank">واتساب</a>
+            <button class="btn details-btn" onclick="toggleDescription()">تفاصيل المنتج</button>
+            <a href="{original_link}" class="btn buy-now-btn" target="_blank">اشتريه الآن</a>
+        </div>
+        <p id="description" class="description">{description}</p>
+    </div>
+    <script>
+        function toggleDescription() {{
+            const desc = document.getElementById('description');
+            const btn = document.querySelector('.details-btn');
+            if (desc.style.display !== 'none') {{
+                desc.style.display = 'none';
+                btn.innerText = 'إظهار التفاصيل';
+            }} else {{
+                desc.style.display = 'block';
+                btn.innerText = 'إخفاء التفاصيل';
+            }}
+        }}
+    </script>
 </body>
 </html>
 """
 
-# --- السكربت الرئيسي (لم يتغير) ---
-def build_pages():
-    whatsapp_number = '+201110760081' # استبدل هذا الرقم برقمك
-
-    try:
-        with open(JSON_FILE, 'r', encoding='utf-8') as f:
-            products = json.load(f)
-    except FileNotFoundError:
-        print(f"خطأ: لم يتم العثور على ملف {JSON_FILE}")
-        return
-    except json.JSONDecodeError:
-        print(f"خطأ: ملف {JSON_FILE} يحتوي على صيغة غير صالحة.")
-        return
-        
+# --- السكربت الرئيسي ---
+def build_product_pages():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
-    for product in products:
-        product_title = product.get('العنوان')
-        if not product_title:
-            continue
+    with open(JSON_FILE, 'r', encoding='utf-8') as f:
+        products = json.load(f)
 
-        slug = urllib.parse.quote(product_title)
-        file_path = os.path.join(OUTPUT_DIR, f"{slug}.html")
+    for product in products:
+        title = product.get('العنوان', 'منتج')
+        whatsapp_message = f"أهلاً، أرغب في طلب المنتج التالي:\n\n*المنتج:* {title}\n*السعر:* {product.get('ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ')}"
         
-        html_content = get_product_html_template(product, whatsapp_number)
+        html_content = PRODUCT_TEMPLATE.format(
+            title=title,
+            image=product.get('رابط الصورة', ''),
+            new_price=product.get('ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ', ''),
+            old_price=product.get('ﺎﻠﺴﻋﺭ', ''),
+            description=product.get('الوصف', ''),
+            whatsapp_link=f"https://wa.me/{PHONE_NUMBER}?text={urllib.parse.quote(whatsapp_message)}",
+            original_link=product.get('الرابط', '#')
+        )
         
+        file_path = os.path.join(OUTPUT_DIR, f"{urllib.parse.quote(title)}.html")
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        
-        print(f"تم إنشاء الصفحة: {file_path}")
-
-    print("\nاكتمل بناء جميع صفحات المنتجات بنجاح!")
+        print(f"تم إنشاء: {file_path}")
 
 if __name__ == '__main__':
-    build_pages()
+    build_product_pages()
+    print("\nاكتمل إنشاء جميع صفحات المنتجات.")
+
