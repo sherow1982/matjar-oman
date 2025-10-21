@@ -4,23 +4,25 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>تفاصيل المنتج - متجر عمان</title>
-    <meta name="description" content="ستظهر تفاصيل المنتج هنا.">
+    <meta name="description" content="صفحة تفاصيل المنتج في متجر عمان. شراء منتجات عالية الجودة بأسعار تنافسية من سلطنة عمان.">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
     <style>
-      body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
-      .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-      header, footer { text-align: center; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-      header nav a, footer nav a { margin: 0 15px; color: #007bff; font-weight: bold; text-decoration: none; }
-      .brand { font-size: 1.8rem; font-weight: bold; color: #333; text-decoration: none; display: block; margin-bottom: 10px; }
-      footer { margin-top: 40px; padding-bottom: 20px; }
-      img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; }
-      h1 { text-align: center; font-size: 2.5rem; }
-      .price { text-align: center; font-size: 2rem; font-weight: bold; color: #28a745; }
-      .old-price { color: #999; text-decoration: line-through; font-size: 1.2rem; }
-      .description { white-space: pre-wrap; margin: 20px 0; border-top: 1px solid #eee; padding-top: 20px; }
-      .btn { display: block; background-color: #007bff; color: white; padding: 12px 30px; text-align: center; border-radius: 50px; font-weight: bold; text-decoration: none; margin: 20px auto; }
-      .reviews-section { text-align: right; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px; }
-      .review-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
+        .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        header, footer { text-align: center; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        header nav a, footer nav a { margin: 0 15px; color: #007bff; font-weight: bold; text-decoration: none; }
+        .brand { font-size: 1.8rem; font-weight: bold; color: #333; text-decoration: none; display: block; margin-bottom: 10px; }
+        footer { margin-top: 40px; padding-bottom: 20px;}
+        img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        h1 { text-align: center; font-size: 2.5rem; }
+        .price { text-align: center; font-size: 2rem; font-weight: bold; color: #28a745; }
+        .old-price { text-decoration: line-through; color: #999; font-size: 1.2rem; }
+        .description { white-space: pre-wrap; margin: 20px 0; border-top: 1px solid #eee; padding-top: 20px; }
+        .btn { display: block; background-color: #007bff; color: white; padding: 12px 30px; text-align: center; border-radius: 50px; font-weight: bold; text-decoration: none; margin: 20px auto; }
+        .reviews-section { text-align: right; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px; }
+        .review-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+        .review-stars { color: gold; font-size: 18px; }
+        .review-author { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -47,58 +49,77 @@
     </footer>
     <script>
         const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
-        const MALE_NAMES = ["سعود", "خالد", "علي", "ناصر", "فهد"];
-        const FEMALE_NAMES = ["سارة", "نور", "هدى", "ميساء", "ريم"];
-        const REVIEW_TEXTS = [
-          "منتج ممتاز وجودة عالية، أنصح به بشدة.",
-          "وصلني بسرعة والتغليف كان رائع.",
-          "نفس الصورة وأفضل، سعيد جدًا بالمنتج."
-        ];
 
         document.addEventListener('DOMContentLoaded', () => {
-          const params = new URLSearchParams(window.location.search);
-          const productName = params.get('name');
-          if (!productName) {
-            document.getElementById('product-detail').textContent = 'لم يتم تحديد المنتج.';
-            return;
-          }
-          fetch(productsUrl)
-            .then(res => res.json())
-            .then(products => {
-              const product = products.find(p => p.العنوان === productName);
-              if (!product) {
-                document.getElementById('product-detail').textContent = 'المنتج غير موجود.';
+            const params = new URLSearchParams(window.location.search);
+            const productName = params.get('name');
+            if (!productName) {
+                document.getElementById('product-detail').textContent = 'لم يتم تحديد المنتج.';
                 return;
-              }
-              document.title = `${product.العنوان} | متجر عمان`;
-              displayProductDetails(product);
-              addJsonLdSchema(product);
-            })
-            .catch(e => {
-              document.getElementById('product-detail').textContent = 'حدث خطأ في تحميل المنتج.';
-              console.error(e);
-            });
+            }
+            fetch(productsUrl)
+                .then(res => res.json())
+                .then(products => {
+                    const product = products.find(p => p.العنوان === productName);
+                    if (!product) {
+                        document.getElementById('product-detail').textContent = 'المنتج غير موجود.';
+                        return;
+                    }
+                    document.title = `${product.العنوان} | متجر عمان`;
+                    document.querySelector('meta[name="description"]').setAttribute("content", `اشترِ ${product.العنوان} بأفضل سعر في عمان. ${product.الوصف.substring(0, 150)}...`);
+                    displayProductDetails(product);
+                });
         });
 
         function displayProductDetails(product) {
-          const container = document.getElementById('product-detail');
-          container.innerHTML = `
-            <h1>${product.العنوان}</h1>
-            <img loading="lazy" src="${product['رابط الصورة']}" alt="صورة ${product.العنوان} في عمان">
-            <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
-            <a href="${product.الرابط}" class="btn" target="_blank">اشتريه الآن من المتجر الأصلي</a>
-            <div class="description"><h2>وصف المنتج</h2><p>${product.الوصف.replace(/\\n/g, '<br>')}</p></div>
-            <div class="reviews-section"><h3>تقييمات المشترين</h3>${generateRandomReviews()}</div>
-          `;
+            const container = document.getElementById('product-detail');
+            container.innerHTML = `
+                <h1>${product.العنوان}</h1>
+                <img loading="lazy" src="${product['رابط الصورة']}" alt="صورة ${product.العنوان} في عمان">
+                <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
+                <a href="${product.الرابط}" class="btn" target="_blank">اشتريه الآن من المتجر الأصلي</a>
+                <div class="description"><h2>وصف المنتج</h2><p>${product.الوصف.replace(/\\n/g, '<br>')}</p></div>
+                <div class="reviews-section">
+                    <h3>تقييمات المشترين</h3>
+                    ${generateDynamicReviews()}
+                </div>
+            `;
         }
 
-        function generateRandomReviews() {
-          // الكود الخاص بتوليد التقييمات يعمل بشكل صحيح
-          return ''; 
-        }
+        function generateDynamicReviews() {
+            const MALE_NAMES = ["سالم", "علي", "خالد", "ناصر", "سعود"];
+            const FEMALE_NAMES = ["فاطمة", "مريم", "شيخة", "نورة", "عائشة"];
+            const REVIEW_TEXTS = [
+                "منتج فنان صراحة، ويستاهل كل ريال. ما ندمت إني خذيته.",
+                "ما شاء الله على الجودة! وصلني بسرعة والتغليف كان ممتاز.",
+                "حبيته واجد، عملي ومفيد فالبيت. كل حد يسألني عنه.",
+                "لا تترددوا، منتج بطل ويستاهل التجربة. أنصحكم فيه وبقوة.",
+                "والله منتج أصلي وحل لي مشكلة كبيرة. شكرًا لكم."
+            ];
+            let reviewsHtml = '';
+            const allNames = [...MALE_NAMES, ...FEMALE_NAMES];
+            const usedNames = new Set();
+            const usedTexts = new Set();
 
-        function addJsonLdSchema(product) {
-          // كود البيانات المنظمة يعمل بشكل صحيح
+            for (let i = 0; i < 5; i++) {
+                let name, text;
+                do { name = allNames[Math.floor(Math.random() * allNames.length)]; } while (usedNames.has(name));
+                do { text = REVIEW_TEXTS[Math.floor(Math.random() * REVIEW_TEXTS.length)]; } while (usedTexts.has(text));
+                
+                usedNames.add(name);
+                usedTexts.add(text);
+                const rating = Math.floor(Math.random() * 2) + 4; // 4 or 5 stars
+                const stars = '&#9733;'.repeat(rating) + '&#9734;'.repeat(5 - rating);
+
+                reviewsHtml += `
+                    <div class="review-item">
+                        <div class="review-stars">${stars}</div>
+                        <p class="review-author"><strong>${name} من مسقط</strong></p>
+                        <p>${text}</p>
+                    </div>
+                `;
+            }
+            return reviewsHtml;
         }
     </script>
 </body>
