@@ -3,38 +3,38 @@ name: Generate Google Merchant Feed
 on:
   push:
     branches:
-      - main  # يعمل عند أي تحديث لملف products.json
+      - main
   schedule:
-    - cron: '0 0 * * *' # يعمل تلقائياً مرة كل يوم في منتصف الليل
-  workflow_dispatch: # يسمح بالتشغيل اليدوي من تبويب Actions
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Generate Google Feed
         id: generate_feed
         run: |
-          # تثبيت الحزم المطلوبة
           npm install node-fetch@2
-
-          # كتابة سكربت التوليد
           node -e "
           const fetch = require('node-fetch');
           const fs = require('fs');
-
           const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
           let xmlItems = '';
-
           fetch(productsUrl)
             .then(res => res.json())
             .then(products => {
@@ -42,7 +42,6 @@ jobs:
                 const productId = String(product.id || product.العنوان).replace(/&/g, '&amp;');
                 const productLink = \`https://sherow1982.github.io/matjar-oman/product-detail.html?name=\${encodeURIComponent(product.العنوان)}\`;
                 const price = \`\${String(product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']).replace(/[^0-9.]/g, '')} OMR\`;
-
                 xmlItems += \`
     <item>
       <g:id>\${productId}</g:id>
@@ -56,7 +55,6 @@ jobs:
       <g:condition>new</g:condition>
     </item>\`;
               });
-
               const fullFeed = \`<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>
 <rss xmlns:g=\\\"http://base.google.com/ns/1.0\\\" version=\\\"2.0\\\">
 <channel>
@@ -65,21 +63,17 @@ jobs:
   <description>قائمة منتجات متجر عمان</description>\${xmlItems}
 </channel>
 </rss>\`;
-
               fs.writeFileSync('google-feed.xml', fullFeed);
-              console.log('Google Merchant feed generated successfully.');
             });
           "
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          # التأكد من نشر الملف الجديد فقط
-          keep_files: true 
-          # تحديد الملفات التي سيتم نشرها
-          publish_branch: gh-pages
-          # اختيار الفرع الذي سيتم النشر فيه
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-
+          path: '.'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
