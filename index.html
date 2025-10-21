@@ -17,6 +17,10 @@
         .product-card { background-color: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); padding: 20px; text-align: center; }
         .product-card img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; cursor: pointer; }
         .price { font-size: 1.5rem; font-weight: bold; color: #28a745; }
+        .old-price { color: #999; text-decoration: line-through; }
+        .btn { cursor: pointer; border-radius: 50px; border: none; padding: 10px 18px; font-size: 0.9rem; font-weight: bold; margin: 4px; text-decoration: none; display: inline-block; }
+        .whatsapp-btn { background-color: #25D366; color: white; }
+        .details-btn, .buy-now-btn { background-color: #007bff; color: white; }
     </style>
 </head>
 <body>
@@ -42,7 +46,45 @@
         <p>© 2025 متجر عمان - جميع الحقوق محفوظة</p>
     </footer>
     <script>
-        // محتوى JavaScript يبقى كما هو بدون تغيير
+        const productsUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
+        const phoneNumber = '+201110760081';
+
+        function openWhatsApp(productName, price) {
+          const message = encodeURIComponent(`أهلاً، أرغب في طلب المنتج التالي:\n\n*المنتج:* ${productName}\n*السعر:* ${price}`);
+          window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const productGrid = document.getElementById('product-grid');
+          fetch(productsUrl)
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(products => {
+              productGrid.innerHTML = '';
+              products.forEach(product => {
+                const detailPageUrl = `product-detail.html?name=${encodeURIComponent(product.العنوان)}`;
+                const card = document.createElement('article');
+                card.className = 'product-card';
+                card.setAttribute('role', 'article');
+                card.innerHTML = `
+                  <a href="${detailPageUrl}" target="_blank" aria-label="تفاصيل ${product.العنوان}"><img loading="lazy" src="${product['رابط الصورة']}" alt="صورة ${product.العنوان} في عمان"></a>
+                  <h2><a href="${detailPageUrl}" target="_blank" style="text-decoration:none; color:inherit;" aria-label="عنوان المنتج ${product.العنوان}">${product.العنوان}</a></h2>
+                  <p class="price" aria-label="السعر الحالي">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price" aria-label="السعر القديم">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
+                  <div class="buttons-container">
+                    <button class="btn whatsapp-btn" onclick="openWhatsApp('${product.العنوان}', '${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']}')" aria-label="التواصل واتساب من أجل ${product.العنوان}">واتساب</button>
+                    <a href="${detailPageUrl}" class="btn details-btn" target="_blank" aria-label="مشاهدة تفاصيل ${product.العنوان}">تفاصيل المنتج</a>
+                  </div>
+                `;
+                productGrid.appendChild(card);
+              });
+            })
+            .catch(error => {
+              productGrid.innerHTML = '<p>حدث خطأ في تحميل المنتجات. يرجى المحاولة لاحقاً.</p>';
+              console.error(error);
+            });
+        });
     </script>
 </body>
 </html>
