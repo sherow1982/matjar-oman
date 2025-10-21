@@ -7,19 +7,24 @@
     <meta name="description" content="مقالات ومراجعات مفصلة لأحدث المنتجات في سلطنة عمان.">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
     <style>
-     body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background: #f8f8f8; color: #333; }
-     .container { width: 90%; max-width: 900px; margin: auto; padding: 20px; }
-     header, footer { text-align: center; background: #fff; padding: 1rem 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-     header nav a, footer nav a { margin: 0 15px; color: #007bff; font-weight: bold; text-decoration: none; }
-     .brand { font-size: 1.8rem; font-weight: bold; color: #333; text-decoration: none; display: block; margin-bottom: 10px; }
-     footer { margin-top: 40px; padding-bottom: 20px; }
-     article { background: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-     .btn-container { margin-top: 20px; text-align: center; }
-     .whatsapp-btn, .buy-now-btn { border-radius: 30px; padding: 12px 25px; margin: 5px; font-weight: bold; text-decoration: none; display: inline-block; color: white; border: none; }
-     .whatsapp-btn { background-color: #25D366; }
-     .buy-now-btn { background-color: #007bff; }
-     h2 { margin-top: 0; }
-     p { line-height: 1.8; }
+      body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; background: #f8f8f8; color: #333; }
+      .container { width: 90%; max-width: 900px; margin: auto; padding: 20px; }
+      header, footer { text-align: center; background: #fff; padding: 1rem 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      header nav a, footer nav a { margin: 0 15px; color: #007bff; font-weight: bold; text-decoration: none; }
+      .brand { font-size: 1.8rem; font-weight: bold; color: #333; text-decoration: none; display: block; margin-bottom: 10px; }
+      footer { margin-top: 40px; padding-bottom: 20px; }
+      article { background: #fff; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+      .btn-container { margin-top: 20px; text-align: center; }
+      .whatsapp-btn, .buy-now-btn { border: none; border-radius: 30px; color: white; padding: 12px 25px; margin: 5px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+      .whatsapp-btn { background-color: #25D366; }
+      .buy-now-btn { background-color: #007bff; }
+      img.product-image { max-width: 350px; margin: 10px auto; display: block; border-radius: 10px; }
+      h2 { margin-top: 0; }
+      p { line-height: 1.8; }
+      .reviews-section { margin-top: 20px; text-align: right; border-top: 1px solid #ddd; padding-top: 15px; }
+      .review-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+      .review-stars { color: gold; font-size: 18px; margin-bottom: 3px; }
+      .review-author { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -51,32 +56,56 @@
         function generateSeoArticle(product) {
           const title = product.العنوان;
           const keywords = `${title}, شراء ${title}, أفضل ${title} في عمان, تسوق ${title} أونلاين, سعر ${title} في عمان`;
-          return `
-            <article>
-                <h2>دليلك الشامل لشراء ${title} في سلطنة عمان</h2>
-                <p>في سوق اليوم المزدحم بالخيارات، يبرز <strong>${title}</strong> كأحد المنتجات التي تجمع بين الجودة الفائقة والسعر التنافسي، مما يجعله الخيار الأول للكثيرين في سلطنة عمان. سواء كنت تبحث عن حل عملي لاحتياجاتك اليومية أو ترغب في الحصول على أحدث التقنيات، فإن هذا المنتج يقدم لك قيمة حقيقية.</p>
-                <p>أصبح <strong>تسوق ${title} أونلاين</strong> الآن أسهل من أي وقت مضى عبر متجرنا. نحن نوفر لك تجربة شراء سلسة وآمنة، مع ضمان الحصول على أفضل <strong>سعر لـ ${title} في عمان</strong>. الكلمات المفتاحية مثل <i>${keywords}</i> تلعب دورًا حيويًا في مساعدتك على إيجاد هذا المنتج الاستثنائي بسهولة.</p>
-                <div class="btn-container">
-                    <button class="whatsapp-btn" onclick="window.open('https://wa.me/${phoneNumber}?text=أهلاً، أرغب في الاستفسار عن منتج: ${title}', '_blank')">تواصل واتساب</button>
-                    <a href="${product.الرابط}" class="buy-now-btn" target="_blank">اشتريه الآن من المتجر الأصلي</a>
+          
+          let reviewsHtml = '';
+          // تحقق من وجود تقييمات في ملف JSON
+          if (product.تقييمات && product.تقييمات.length > 0) {
+            reviewsHtml += '<h3>تقييمات المشترين</h3>';
+            product.تقييمات.forEach(review => {
+              let stars = '&#9733;'.repeat(review.rating) + '&#9734;'.repeat(5 - review.rating);
+              reviewsHtml += `
+                <div class="review-item">
+                  <div class="review-stars">${stars}</div>
+                  <p class="review-author">${review.user}</p>
+                  <p>${review.comment}</p>
                 </div>
+              `;
+            });
+          } else {
+            reviewsHtml = '<p>لا توجد تقييمات لهذا المنتج حتى الآن.</p>';
+          }
+
+          const article = `
+            <article>
+              <h2>${title}</h2>
+              <img loading="lazy" src="${product['رابط الصورة']}" alt="${title} صورة" class="product-image" />
+              <p>في سوق اليوم المزدحم بالخيارات، يبرز <strong>${title}</strong> كأحد المنتجات التي تجمع بين الجودة الفائقة والسعر التنافسي، مما يجعله الخيار الأول للكثيرين في سلطنة عمان. سواء كنت تبحث عن حل عملي لاحتياجاتك اليومية أو ترغب في الحصول على أحدث التقنيات، فإن هذا المنتج يقدم لك قيمة حقيقية.</p>
+              <p>الكلمات المفتاحية مثل <i>${keywords}</i> ستساعدك على إيجاد هذا المنتج بسهولة عبر محركات البحث.</p>
+              <div class="reviews-section">
+                ${reviewsHtml}
+              </div>
+              <div class="btn-container">
+                <button class="whatsapp-btn" onclick="window.open('https://wa.me/${phoneNumber}?text=أهلاً، أرغب في الاستفسار عن منتج: ${title}', '_blank')">تواصل واتساب</button>
+                <a href="${product.الرابط}" class="buy-now-btn" target="_blank">اشتريه الآن من المتجر الأصلي</a>
+              </div>
             </article>
           `;
+          return article;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const blogPostsContainer = document.getElementById('blog-posts');
-            fetch(productsUrl)
-                .then(response => response.json())
-                .then(products => {
-                    blogPostsContainer.innerHTML = '';
-                    products.forEach(product => {
-                        blogPostsContainer.innerHTML += generateSeoArticle(product);
-                    });
-                })
-                .catch(() => {
-                    blogPostsContainer.innerHTML = '<p>حدث خطأ في تحميل المقالات.</p>';
-                });
+          const blogPostsContainer = document.getElementById('blog-posts');
+          fetch(productsUrl)
+            .then(res => res.json())
+            .then(products => {
+              blogPostsContainer.innerHTML = '';
+              products.forEach(product => {
+                blogPostsContainer.innerHTML += generateSeoArticle(product);
+              });
+            })
+            .catch(() => {
+              blogPostsContainer.innerHTML = '<p>حدث خطأ في تحميل المقالات.</p>';
+            });
         });
     </script>
 </body>
