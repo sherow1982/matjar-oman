@@ -29,6 +29,13 @@
     </div>
 
     <script>
+        // الصق محتوى ملف products.json هنا
+        const productsData = [
+            // مثال:
+            // { "العنوان": "اسم المنتج", "الوصف": "وصف المنتج", ... },
+            // { "العنوان": "اسم المنتج الثاني", "الوصف": "وصف المنتج الثاني", ... }
+        ];
+
         const MALE_NAMES = ["سعود", "خالد", "علي", "ناصر", "فهد", "طارق", "سالم", "هشام"];
         const FEMALE_NAMES = ["سارة", "نور", "هدى", "ميساء", "ريم", "جود", "ليان", "دانية"];
         const REVIEW_TEXTS = [
@@ -48,20 +55,12 @@
                 return;
             }
 
-            fetch('https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json')
-                .then(response => response.json())
-                .then(products => {
-                    const product = products.find(p => p.العنوان === productName);
-                    if (product) {
-                        displayProductDetails(product);
-                    } else {
-                        document.getElementById('product-detail').innerHTML = '<p>المنتج غير موجود.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching product data:', error);
-                    document.getElementById('product-detail').innerHTML = '<p>حدث خطأ في تحميل بيانات المنتج.</p>';
-                });
+            const product = productsData.find(p => p.العنوان === productName);
+            if (product) {
+                displayProductDetails(product);
+            } else {
+                document.getElementById('product-detail').innerHTML = '<p>المنتج غير موجود.</p>';
+            }
         });
 
         function displayProductDetails(product) {
