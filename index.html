@@ -57,31 +57,26 @@
         document.addEventListener('DOMContentLoaded', () => {
           const productGrid = document.getElementById('product-grid');
           fetch(productsUrl)
-            .then(response => {
-              if (!response.ok) throw new Error('Network response was not ok');
-              return response.json();
-            })
+            .then(res => res.json())
             .then(products => {
               productGrid.innerHTML = '';
               products.forEach(product => {
-                const detailPageUrl = `product-detail.html?name=${encodeURIComponent(product.العنوان)}`;
-                const card = document.createElement('article');
+                const detailPage = `product-detail.html?name=${encodeURIComponent(product.العنوان)}`;
+                const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
-                  <a href="${detailPageUrl}" target="_blank"><img loading="lazy" src="${product['رابط الصورة']}" alt="صورة ${product.العنوان} في عمان"></a>
-                  <h2><a href="${detailPageUrl}" target="_blank" style="text-decoration:none; color:inherit;">${product.العنوان}</a></h2>
+                  <a href="${detailPage}" target="_blank"><img loading="lazy" src="${product['رابط الصورة']}" alt="${product.العنوان} صورة"></a>
+                  <h2><a href="${detailPage}" target="_blank" style="text-decoration:none; color:#333">${product.العنوان}</a></h2>
                   <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
-                  <div>
-                    <button class="btn whatsapp-btn" onclick="openWhatsApp('${product.العنوان}', '${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']}')">واتساب</button>
-                    <a href="${detailPageUrl}" class="btn details-btn" target="_blank">تفاصيل المنتج</a>
-                  </div>
+                  <button class="whatsapp-btn btn" onclick="openWhatsApp('${product.العنوان}', '${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']}')">واتساب</button>
+                  <a href="${detailPage}" target="_blank" class="details-btn btn">التفاصيل</a>
                 `;
                 productGrid.appendChild(card);
               });
             })
-            .catch(error => {
+            .catch(err => {
               productGrid.innerHTML = '<p>حدث خطأ في تحميل المنتجات. يرجى المحاولة لاحقاً.</p>';
-              console.error(error);
+              console.error(err);
             });
         });
     </script>
