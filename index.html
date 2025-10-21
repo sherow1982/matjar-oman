@@ -30,32 +30,34 @@
     <main class="container">
         <div id="product-grid" class="product-grid"></div>
     </main>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const jsonUrl = 'https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json';
-            
-            fetch(jsonUrl)
-                .then(response => response.json())
-                .then(products => {
-                    const productGrid = document.getElementById('product-grid');
-                    products.forEach(product => {
-                        const card = document.createElement('div');
-                        card.className = 'product-card';
-                        
-                        const detailPageUrl = `product-detail.html?name=${encodeURIComponent(product.العنوان)}`;
 
-                        card.innerHTML = `
-                            <a href="${detailPageUrl}" target="_blank"><img src="${product['رابط الصورة']}" alt="${product.العنوان}"></a>
-                            <h3><a href="${detailPageUrl}" target="_blank" style="text-decoration:none; color:inherit;">${product.العنوان}</a></h3>
-                            <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
-                            <div class="buttons-container">
-                                <button class="btn whatsapp-btn" onclick="openWhatsApp('${product.العنوان}', '${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']}')">واتساب</button>
-                                <a href="${detailPageUrl}" class="btn details-btn" target="_blank">تفاصيل المنتج</a>
-                            </div>
-                        `;
-                        productGrid.appendChild(card);
-                    });
-                });
+    <script>
+        // الصق محتوى ملف products.json هنا
+        const productsData = [
+            // مثال:
+            // { "العنوان": "اسم المنتج", "الوصف": "وصف المنتج", ... },
+            // { "العنوان": "اسم المنتج الثاني", "الوصف": "وصف المنتج الثاني", ... }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const productGrid = document.getElementById('product-grid');
+            productsData.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                const detailPageUrl = `product-detail.html?name=${encodeURIComponent(product.العنوان)}`;
+
+                card.innerHTML = `
+                    <a href="${detailPageUrl}" target="_blank"><img src="${product['رابط الصورة']}" alt="${product.العنوان}"></a>
+                    <h3><a href="${detailPageUrl}" target="_blank" style="text-decoration:none; color:inherit;">${product.العنوان}</a></h3>
+                    <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
+                    <div class="buttons-container">
+                        <button class="btn whatsapp-btn" onclick="openWhatsApp('${product.العنوان}', '${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']}')">واتساب</button>
+                        <a href="${detailPageUrl}" class="btn details-btn" target="_blank">تفاصيل المنتج</a>
+                    </div>
+                `;
+                productGrid.appendChild(card);
+            });
         });
 
         function openWhatsApp(productName, price) {
