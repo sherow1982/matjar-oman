@@ -112,3 +112,4 @@ def build_product_pages():
 if __name__ == '__main__':
     build_product_pages()
     print("\nاكتمل إنشاء جميع صفحات المنتجات.")
+
