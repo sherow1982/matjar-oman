@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل المنتج - متجر عمان</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Cairo", sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; color: #333; }
+        .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        img { max-width: 100%; border-radius: 8px; margin-bottom: 20px; }
+        h1 { text-align: center; font-size: 2.5rem; }
+        .price { text-align: center; font-size: 2rem; font-weight: bold; color: #28a745; }
+        .old-price { text-decoration: line-through; color: #999; font-size: 1.2rem; }
+        .description { white-space: pre-wrap; margin: 20px 0; border-top: 1px solid #eee; padding-top: 20px; }
+        .btn { padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; background-color: #007bff; color: white; display: block; text-align: center; margin: 20px auto; }
+        .reviews-section { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; text-align: right; }
+        .review-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .review-stars { color: gold; font-size: 20px; margin-bottom: 5px; }
+        .review-author { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="product-detail">
+            <p>جاري تحميل بيانات المنتج...</p>
+        </div>
+        <a href="index.html" style="display:block; text-align:center; margin-top:20px; color:#007bff; font-weight:bold; text-decoration:none;">العودة للمنتجات</a>
+    </div>
+
+    <script>
+        const MALE_NAMES = ["سعود", "خالد", "علي", "ناصر", "فهد", "طارق", "سالم", "هشام"];
+        const FEMALE_NAMES = ["سارة", "نور", "هدى", "ميساء", "ريم", "جود", "ليان", "دانية"];
+        const REVIEW_TEXTS = [
+            "والله منتج فنان وحل لي مشكلة كبيرة. أنصحكم فيه وبقوة.",
+            "ما شاء الله على الجودة، صراحة فرق عن بو فالسوق. يستاهل كل ريال.",
+            "وصلني بسرعة والتغليف كان ممتاز. المنتج نفسه نفس ما توقعت وأحسن بعد.",
+            "حبيته واجد، عملي ومفيد فالبيت. كل حد يسألني عنه.",
+            "لا تترددوا، منتج بطل ويستاهل التجربة. ما ندمت إني خذيته."
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const productName = params.get('name');
+
+            if (!productName) {
+                document.getElementById('product-detail').innerHTML = '<p>لم يتم تحديد المنتج.</p>';
+                return;
+            }
+
+            fetch('https://raw.githubusercontent.com/sherow1982/matjar-oman/main/products.json')
+                .then(response => response.json())
+                .then(products => {
+                    const product = products.find(p => p.العنوان === productName);
+                    if (product) {
+                        displayProductDetails(product);
+                    } else {
+                        document.getElementById('product-detail').innerHTML = '<p>المنتج غير موجود.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    document.getElementById('product-detail').innerHTML = '<p>حدث خطأ في تحميل بيانات المنتج.</p>';
+                });
+        });
+
+        function displayProductDetails(product) {
+            const detailContainer = document.getElementById('product-detail');
+            detailContainer.innerHTML = `
+                <h1>${product.العنوان}</h1>
+                <img src="${product['رابط الصورة']}" alt="${product.العنوان}">
+                <p class="price">${product['ﺎﻠﺴﻋﺭ ﺎﻠﻤﺨﻔَّﺿ']} <span class="old-price">${product['ﺎﻠﺴﻋﺭ'] || ''}</span></p>
+                <a href="${product.الرابط}" target="_blank" class="btn">اشتريه الآن من المتجر الأصلي</a>
+                <p class="description">${product.الوصف.replace(/\\n/g, '<br>')}</p>
+                <div class="reviews-section">
+                    <h3>تقييمات المشترين</h3>
+                    ${generateRandomReviews()}
+                </div>
+            `;
+        }
+
+        function generateRandomReviews() {
+            let reviewsHtml = '';
+            const names = [...MALE_NAMES, ...FEMALE_NAMES];
+            const usedNames = new Set();
+            const usedTexts = new Set();
+
+            for (let i = 0; i < 2; i++) {
+                let name, text;
+                do { name = names[Math.floor(Math.random() * names.length)]; } while (usedNames.has(name));
+                do { text = REVIEW_TEXTS[Math.floor(Math.random() * REVIEW_TEXTS.length)]; } while (usedTexts.has(text));
+                
+                usedNames.add(name);
+                usedTexts.add(text);
+                
+                const rating = Math.floor(Math.random() * 2) + 4;
+                reviewsHtml += `
+                    <div class="review-item">
+                        <div class="review-stars">${'&#9733;'.repeat(rating)}${'&#9734;'.repeat(5 - rating)}</div>
+                        <p><strong>${name}</strong></p>
+                        <p>${text}</p>
+                    </div>
+                `;
+            }
+            return reviewsHtml;
+        }
+    </script>
+</body>
+</html>
